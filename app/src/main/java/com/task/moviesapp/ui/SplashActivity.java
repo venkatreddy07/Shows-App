@@ -8,6 +8,7 @@ import android.os.Handler;
 
 import com.task.moviesapp.R;
 import com.task.moviesapp.ui.home.HomeActivity;
+import com.task.moviesapp.util.Utils;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -15,6 +16,9 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+
+        //load bookmarked hashmap data
+        Utils.getBookMarkFromPref();
 
         new Handler().postDelayed(new Runnable() {
             @Override

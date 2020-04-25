@@ -3,6 +3,11 @@ package com.task.moviesapp.ui.home.showFragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
@@ -10,12 +15,6 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.text.TextUtils;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.task.moviesapp.R;
 import com.task.moviesapp.databinding.FragmentShowBinding;
@@ -40,7 +39,7 @@ public class ShowFragment extends Fragment implements ShowsAdapter.ShowDetails {
 
     private ShowsAdapter showsAdapter;
 
-    private int showsCount, loadCount;
+    private int totalResultCount, loadCount;
 
     private List<SearchList> searchLists = new ArrayList<>();
 
@@ -69,9 +68,18 @@ public class ShowFragment extends Fragment implements ShowsAdapter.ShowDetails {
         return binding.getRoot();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (searchLists != null && searchLists.size() > 0) {
+            Utils.checkForBookMarkedDetails(searchLists);
+            showsAdapter.notifyDataSetChanged();
+        }
+    }
+
     private void initView() {
-        ShowViewModelFactory factory = new ShowViewModelFactory(this, binding);
-        viewModel = new ViewModelProvider(this, factory).get(ShowViewModel.class);
+
+        viewModel = new ViewModelProvider(this).get(ShowViewModel.class);
 
         setAdapter(searchLists);
 
@@ -110,8 +118,11 @@ public class ShowFragment extends Fragment implements ShowsAdapter.ShowDetails {
                             if (response.getResponse().equalsIgnoreCase(getString(R.string.response_true))) {
                                 //setAdapter(response.getSearch());
 
-                                showsCount = Integer.parseInt(response.getTotalResults());
+                                totalResultCount = Integer.parseInt(response.getTotalResults());
                                 searchLists.addAll(response.getSearch());
+
+                                Utils.checkForBookMarkedDetails(searchLists);
+
                                 showsAdapter.notifyDataSetChanged();
                             }
                         }
@@ -133,9 +144,15 @@ public class ShowFragment extends Fragment implements ShowsAdapter.ShowDetails {
 
     @Override
     public void loadShows() {
-        if (searchLists.size() < showsCount) {
+        if (searchLists.size() < totalResultCount) {
             loadCount++;
             loadShowsData();
         }
+    }
+
+    @Override
+    public void bookMark(int position) {
+        Utils.storeBookmarkDetails(searchLists, position);
+        showsAdapter.notifyDataSetChanged();
     }
 }

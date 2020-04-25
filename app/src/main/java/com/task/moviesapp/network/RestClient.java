@@ -15,7 +15,7 @@ public class RestClient {
 
     private static RestClient restClient;
 
-    private void setupRestClient(String baseUrl) {
+    private void setupRestClient() {
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder()
                 .connectTimeout(120, TimeUnit.SECONDS)
                 .readTimeout(180, TimeUnit.SECONDS);
@@ -27,7 +27,7 @@ public class RestClient {
         }
 
         Retrofit restAdapter = new Retrofit.Builder()
-                .baseUrl(baseUrl)//passing API_URL
+                .baseUrl(APIConstants.BASE_URL)//passing API_URL
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(httpClient.build())//passing OkHttpClient object
                 .build();
@@ -35,8 +35,8 @@ public class RestClient {
     }
 
     //double checked locking singleTon Design.
-    public static RestClientApiService getApiService(String baseUrl) {
-        getInstance().setupRestClient(baseUrl);
+    public static RestClientApiService getApiService() {
+        getInstance().setupRestClient();
         return apiService;
     }
 

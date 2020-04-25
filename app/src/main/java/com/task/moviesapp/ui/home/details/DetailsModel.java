@@ -1,6 +1,5 @@
 package com.task.moviesapp.ui.home.details;
 
-import com.task.moviesapp.network.APIConstants;
 import com.task.moviesapp.network.ApiResponseListener;
 import com.task.moviesapp.network.CommonNetworkCallback;
 import com.task.moviesapp.network.RestClient;
@@ -12,7 +11,7 @@ import java.util.Map;
 public class DetailsModel {
 
     void getDetailsCall(ApiResponseListener apiResponseListener, Map<String, String> queryMap) {
-        RestClient.getApiService(APIConstants.BASE_URL)
+        RestClient.getApiService()
                 .getDetails(queryMap)
                 .enqueue(new CommonNetworkCallback<DetailsResponse>() {
                     @Override

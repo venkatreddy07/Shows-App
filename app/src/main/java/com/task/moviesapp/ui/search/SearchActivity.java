@@ -1,5 +1,16 @@
 package com.task.moviesapp.ui.search;
 
+import android.content.Intent;
+import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
@@ -7,23 +18,12 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.text.TextUtils;
-import android.view.KeyEvent;
-import android.view.View;
-import android.view.inputmethod.EditorInfo;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import com.task.moviesapp.R;
 import com.task.moviesapp.databinding.ActivitySearchBinding;
 import com.task.moviesapp.network.response.ApiResponse;
 import com.task.moviesapp.network.response.search.SearchList;
 import com.task.moviesapp.network.response.search.SearchResponse;
-import com.task.moviesapp.ui.SplashActivity;
 import com.task.moviesapp.ui.home.details.DetailsActivity;
-import com.task.moviesapp.ui.home.movieFragment.MoviesAdapter;
 import com.task.moviesapp.util.Constants;
 import com.task.moviesapp.util.Utils;
 
@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SearchActivity extends AppCompatActivity implements View.OnClickListener,
-        SearchAdapter.SearchedDetails {
+        SearchAdapter.SearchedDetails, BookMarkAdapter.BookMarkedClicked {
 
     private ActivitySearchBinding binding;
 
@@ -39,9 +39,13 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
 
     private SearchAdapter searchAdapter;
 
-    private int searchCount, loadCount;
+    private int totalResultCount, loadCount;
 
     private List<SearchList> searchLists = new ArrayList<>();
+
+    private List<SearchList> bookMarkList;
+
+    private BookMarkAdapter bookMarkAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,12 +60,37 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void initView() {
+        binding.searchText.requestFocus();
+
         binding.back.setOnClickListener(this);
         binding.search.setOnClickListener(this);
+
+        getBookMarkedData();
 
         setAdapter(searchLists);
 
         loadCount = 1;
+
+        binding.searchText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() > 0) {
+                    binding.search.setVisibility(View.VISIBLE);
+                } else {
+                    binding.search.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
 
         binding.searchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -76,6 +105,45 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         });
     }
 
+    //get the bookmarked details from the sharedpreference
+    private void getBookMarkedData() {
+        bookMarkList = Utils.getBookMarkFromPref();
+
+        if (bookMarkList != null && bookMarkList.size() > 0) {
+            setBookMarkAdapter(bookMarkList);
+        } else {
+            binding.bookmarkRsv.setVisibility(View.GONE);
+        }
+    }
+
+    private void setBookMarkAdapter(List<SearchList> bookMarkList) {
+        binding.bookmarkRsv.setVisibility(View.VISIBLE);
+
+
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this,
+                RecyclerView.HORIZONTAL, false);
+
+        binding.bookmarkRsv.setLayoutManager(mLayoutManager);
+
+        bookMarkAdapter = new BookMarkAdapter(this, bookMarkList, this);
+        binding.bookmarkRsv.setAdapter(bookMarkAdapter);
+    }
+
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.back:
+                onBackPressed();
+                break;
+
+            case R.id.search:
+                getData();
+                break;
+        }
+    }
+
+    //get the result of searched for
     private void getData() {
         String enteredText = binding.searchText.getText().toString().trim();
         if (!TextUtils.isEmpty(enteredText)) {
@@ -86,7 +154,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                     searchLists.clear();
                 }
 
-                viewModel.getSearchedData(enteredText,loadCount).observe(this, new Observer<ApiResponse>() {
+                viewModel.getSearchedData(enteredText, loadCount).observe(this, new Observer<ApiResponse>() {
                     @Override
                     public void onChanged(ApiResponse apiResponse) {
                         binding.searchProgress.setVisibility(View.GONE);
@@ -94,10 +162,12 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                             if (apiResponse.getResponseBody() instanceof SearchResponse) {
                                 SearchResponse response = (SearchResponse) apiResponse.getResponseBody();
                                 if (response.getResponse().equalsIgnoreCase(getString(R.string.response_true))) {
-                                    //setAdapter(response.getSearch());
 
-                                    searchCount = Integer.parseInt(response.getTotalResults());
+                                    totalResultCount = Integer.parseInt(response.getTotalResults());
                                     searchLists.addAll(response.getSearch());
+
+                                    Utils.checkForBookMarkedDetails(searchLists);
+
                                     searchAdapter.notifyDataSetChanged();
 
                                 } else {
@@ -130,16 +200,12 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         binding.searchedRsv.setAdapter(searchAdapter);
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.back:
-                onBackPressed();
-                break;
 
-            case R.id.search:
-                getData();
-                break;
+    @Override
+    public void loadMoreData() {
+        if (searchLists.size() < totalResultCount) {
+            loadCount++;
+            getData();
         }
     }
 
@@ -150,17 +216,44 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     @Override
+    public void bookMark(int position) {
+        Utils.storeBookmarkDetails(searchLists, position);
+        searchAdapter.notifyDataSetChanged();
+
+        getBookMarkedData();
+    }
+
+    @Override
     public void searchedId(String id) {
+        showDetails(id);
+    }
+
+    @Override
+    public void onBookMarkClick(String id) {
+        showDetails(id);
+    }
+
+    private void showDetails(String id) {
         if (!TextUtils.isEmpty(id))
             startActivity(new Intent(this, DetailsActivity.class)
                     .putExtra(Constants.Details.IMBD_ID, id));
     }
 
     @Override
-    public void loadMoreData() {
-        if (searchLists.size() < searchCount) {
-            loadCount++;
-            getData();
+    public void onBookMarkClick(int position) {
+        Utils.storeBookmarkDetails(bookMarkList, position);
+        bookMarkList.remove(position);
+
+        if (bookMarkList.size() == 0) {
+            binding.bookmarkRsv.setVisibility(View.GONE);
         }
+
+        if (searchLists != null && searchLists.size() > 0) {
+            Utils.checkForBookMarkedDetails(searchLists);
+            searchAdapter.notifyDataSetChanged();
+        }
+        bookMarkAdapter.notifyDataSetChanged();
     }
+
+
 }

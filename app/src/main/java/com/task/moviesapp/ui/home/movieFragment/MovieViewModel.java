@@ -1,11 +1,8 @@
 package com.task.moviesapp.ui.home.movieFragment;
 
-import android.content.Context;
-
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.task.moviesapp.databinding.FragmentMovieBinding;
 import com.task.moviesapp.network.APIConstants;
 import com.task.moviesapp.network.ApiResponseListener;
 import com.task.moviesapp.network.response.ApiResponse;
@@ -15,19 +12,13 @@ import java.util.Map;
 
 public class MovieViewModel extends ViewModel {
 
-    private Context context;
-    private FragmentMovieBinding binding;
-
     private MovieModel movieModel;
 
     private MutableLiveData<ApiResponse> mutableLiveData;
 
     private MoviesAdapter moviesAdapter;
 
-    MovieViewModel(Context context, FragmentMovieBinding binding) {
-        this.context = context;
-        this.binding = binding;
-
+    public MovieViewModel() {
         movieModel = new MovieModel();
     }
 

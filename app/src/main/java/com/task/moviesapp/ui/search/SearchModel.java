@@ -12,7 +12,7 @@ import java.util.Map;
 public class SearchModel {
 
     void getSearchCall(ApiResponseListener apiResponseListener, Map<String, String> queryMap) {
-        RestClient.getApiService(APIConstants.BASE_URL)
+        RestClient.getApiService()
                 .getData(queryMap)
                 .enqueue(new CommonNetworkCallback<SearchResponse>() {
                     @Override

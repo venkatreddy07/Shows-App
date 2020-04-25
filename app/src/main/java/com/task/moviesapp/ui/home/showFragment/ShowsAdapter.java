@@ -73,8 +73,23 @@ public class ShowsAdapter extends RecyclerView.Adapter<ShowsAdapter.ViewHolder> 
                 }
             });
 
+            if (search.isBookMarked()) {
+                holder.bookmark.setImageDrawable(context.getDrawable(R.drawable.bookmarked));
+            } else {
+                holder.bookmark.setImageDrawable(context.getDrawable(R.drawable.bookmark));
+            }
+
+            holder.bookmark.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (listener != null) {
+                        listener.bookMark(position);
+                    }
+                }
+            });
+
             //check for last item
-            if(position >= getItemCount()-1){
+            if (position >= getItemCount() - 1) {
                 if (listener != null) {
                     listener.loadShows();
                 }
@@ -89,7 +104,7 @@ public class ShowsAdapter extends RecyclerView.Adapter<ShowsAdapter.ViewHolder> 
 
     class ViewHolder extends RecyclerView.ViewHolder {
         private CardView cardView;
-        private ImageView bgImage;
+        private ImageView bgImage,bookmark;
         private TextView title, year, noImage;
 
         ViewHolder(@NonNull View itemView) {
@@ -97,6 +112,7 @@ public class ShowsAdapter extends RecyclerView.Adapter<ShowsAdapter.ViewHolder> 
 
             cardView = itemView.findViewById(R.id.cardView);
             bgImage = itemView.findViewById(R.id.bg_img);
+            bookmark = itemView.findViewById(R.id.bookmark);
             noImage = itemView.findViewById(R.id.no_image);
 
             title = itemView.findViewById(R.id.title);
@@ -106,6 +122,9 @@ public class ShowsAdapter extends RecyclerView.Adapter<ShowsAdapter.ViewHolder> 
 
     public interface ShowDetails {
         void showId(String id);
+
         void loadShows();
+
+        void bookMark(int position);
     }
 }

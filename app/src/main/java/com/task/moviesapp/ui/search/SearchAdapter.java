@@ -82,6 +82,21 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
                 }
             });
 
+            if (search.isBookMarked()) {
+                holder.bookmark.setImageDrawable(context.getDrawable(R.drawable.bookmarked));
+            } else {
+                holder.bookmark.setImageDrawable(context.getDrawable(R.drawable.bookmark));
+            }
+
+            holder.bookmark.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (listener != null) {
+                        listener.bookMark(position);
+                    }
+                }
+            });
+
             //check for last item
             if (position >= getItemCount() - 1) {
                 if (listener != null) {
@@ -118,5 +133,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         void searchedId(String id);
 
         void loadMoreData();
+
+        void bookMark(int position);
     }
 }

@@ -65,10 +65,18 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
                 holder.year.setText(search.getYear());
             }
 
+            if (search.isBookMarked()) {
+                holder.bookmark.setImageDrawable(context.getDrawable(R.drawable.bookmarked));
+            } else {
+                holder.bookmark.setImageDrawable(context.getDrawable(R.drawable.bookmark));
+            }
+
             holder.bookmark.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    holder.bookmark.setImageDrawable(context.getDrawable(R.drawable.bookmarked));
+                    if (listener != null) {
+                        listener.bookMark(position);
+                    }
                 }
             });
 

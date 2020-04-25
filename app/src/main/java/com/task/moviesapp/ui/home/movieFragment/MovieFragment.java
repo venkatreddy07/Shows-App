@@ -3,6 +3,11 @@ package com.task.moviesapp.ui.home.movieFragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
@@ -10,12 +15,6 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.text.TextUtils;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.task.moviesapp.R;
 import com.task.moviesapp.databinding.FragmentMovieBinding;
@@ -40,7 +39,7 @@ public class MovieFragment extends Fragment implements MoviesAdapter.MovieDetail
 
     private MoviesAdapter moviesAdapter;
 
-    private int moviesCount, loadCount;
+    private int totalResultCount, loadCount;
 
     private List<SearchList> searchLists = new ArrayList<>();
 
@@ -72,14 +71,23 @@ public class MovieFragment extends Fragment implements MoviesAdapter.MovieDetail
 
     private void intiView() {
 
-        MovieViewModelFactory factory = new MovieViewModelFactory(getContext(), binding);
-        viewModel = new ViewModelProvider(this, factory).get(MovieViewModel.class);
+        viewModel = new ViewModelProvider(this).get(MovieViewModel.class);
 
         setAdapter(searchLists);
 
         loadCount = 1;
 
         loadShowsData();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (searchLists != null && searchLists.size() > 0) {
+            Utils.checkForBookMarkedDetails(searchLists);
+            moviesAdapter.notifyDataSetChanged();
+        }
+
     }
 
     private void setAdapter(List<SearchList> search) {
@@ -110,10 +118,12 @@ public class MovieFragment extends Fragment implements MoviesAdapter.MovieDetail
                         if (apiResponse.getResponseBody() instanceof SearchResponse) {
                             SearchResponse response = (SearchResponse) apiResponse.getResponseBody();
                             if (response.getResponse().equalsIgnoreCase(getString(R.string.response_true))) {
-                                //setAdapter(response.getSearch());
 
-                                moviesCount = Integer.parseInt(response.getTotalResults());
+                                totalResultCount = Integer.parseInt(response.getTotalResults());
                                 searchLists.addAll(response.getSearch());
+
+                                Utils.checkForBookMarkedDetails(searchLists);
+
                                 moviesAdapter.notifyDataSetChanged();
                             }
                         }
@@ -134,7 +144,7 @@ public class MovieFragment extends Fragment implements MoviesAdapter.MovieDetail
 
     @Override
     public void loadMovies() {
-        if (searchLists.size() < moviesCount) {
+        if (searchLists.size() < totalResultCount) {
             loadCount++;
             loadShowsData();
         }
@@ -142,6 +152,7 @@ public class MovieFragment extends Fragment implements MoviesAdapter.MovieDetail
 
     @Override
     public void bookMark(int position) {
-
+        Utils.storeBookmarkDetails(searchLists, position);
+        moviesAdapter.notifyDataSetChanged();
     }
 }

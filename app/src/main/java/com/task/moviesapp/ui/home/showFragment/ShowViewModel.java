@@ -3,7 +3,6 @@ package com.task.moviesapp.ui.home.showFragment;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.task.moviesapp.databinding.FragmentShowBinding;
 import com.task.moviesapp.network.APIConstants;
 import com.task.moviesapp.network.ApiResponseListener;
 import com.task.moviesapp.network.response.ApiResponse;
@@ -12,17 +11,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ShowViewModel extends ViewModel {
-    private ShowFragment showFragment;
-    private FragmentShowBinding binding;
 
     private ShowModel showModel;
 
     private MutableLiveData<ApiResponse> mutableLiveData;
 
-    public ShowViewModel(ShowFragment showFragment, FragmentShowBinding binding) {
-        this.showFragment = showFragment;
-        this.binding = binding;
-
+    public ShowViewModel() {
         showModel = new ShowModel();
     }
 

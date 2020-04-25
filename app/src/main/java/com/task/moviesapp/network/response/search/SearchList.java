@@ -20,6 +20,16 @@ public class SearchList {
     @Expose
     private String poster;
 
+    private boolean bookMarked;
+
+    public boolean isBookMarked() {
+        return bookMarked;
+    }
+
+    public void setBookMarked(boolean bookMarked) {
+        this.bookMarked = bookMarked;
+    }
+
     public String getTitle() {
         return title;
     }
