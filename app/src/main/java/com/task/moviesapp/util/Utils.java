@@ -67,7 +67,7 @@ public class Utils {
         }
     }
 
-    //get inbox map in preference
+    //get bookmarked data into map from preference
     public static List<SearchList> getBookMarkFromPref() {
 
         String storedHashMapString = MyApplication.sharedPreferences.getStringSharedPreference(Constants.Pref.BOOK_MRK, null);

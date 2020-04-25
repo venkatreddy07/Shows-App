@@ -35,35 +35,30 @@
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                        android:layout_height="match_parent"
+                        android:background="@color/white">
 
-                        <androidx.cardview.widget.CardView
-                            android:id="@+id/bg_img_cardview"
+
+                        <ImageView
+                            android:id="@+id/background_img"
                             android:layout_width="0dp"
                             android:layout_height="0dp"
-                            app:cardElevation="0dp"
+                            android:scaleType="fitXY"
                             app:layout_constraintDimensionRatio="H,2:1"
                             app:layout_constraintLeft_toLeftOf="parent"
                             app:layout_constraintRight_toRightOf="parent"
-                            app:layout_constraintTop_toTopOf="parent">
+                            app:layout_constraintTop_toTopOf="parent" />
 
-                            <ImageView
-                                android:id="@+id/background_img"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:scaleType="fitXY" />
+                        <TextView
+                            android:id="@+id/no_image"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:text="@string/na"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/sp_30"
+                            android:visibility="gone" />
 
-                            <TextView
-                                android:id="@+id/no_image"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:gravity="center"
-                                android:text="@string/na"
-                                android:visibility="gone"
-                                android:textColor="@color/black"
-                                android:textSize="@dimen/sp_30" />
-
-                        </androidx.cardview.widget.CardView>
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
