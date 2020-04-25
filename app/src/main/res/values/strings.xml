@@ -1,0 +1,33 @@
+<resources>
+    <string name="app_name">MoviesApp</string>
+    <string name="entertainment">Entertainment</string>
+
+    <string name="movies">Movies</string>
+    <string name="shows">Shows</string>
+
+    <string name="response_true">True</string>
+
+    <string name="network_issue">Please check your connectivity</string>
+    <string name="text_issue">Please enter details</string>
+
+    <string name="search_hit">Search for Movies/Shows</string>
+
+    <string name="error_text">Movie/Show not found!</string>
+
+    <!--Details Screen-->
+    <string name="title">Title</string>
+    <string name="lang">Language</string>
+    <string name="year">Year</string>
+    <string name="relase_yr">Release Year</string>
+    <string name="rating">IMBd Rating</string>
+    <string name="genre">Genre</string>
+    <string name="actor">Actors</string>
+    <string name="award">Awards</string>
+    <string name="box_office">BoxOffice</string>
+    <string name="production">Production</string>
+    <string name="director">Director</string>
+    <string name="writer">Writer</string>
+    <string name="na">NA</string>
+    <string name="na_img">N/A</string>
+
+</resources>
