@@ -14,8 +14,6 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        new AppApplication().setContext(this);
-
-        sharedPreferences = AppSharedPreferences.getInstance();
+        sharedPreferences = AppSharedPreferences.getInstance(this);
     }
 }

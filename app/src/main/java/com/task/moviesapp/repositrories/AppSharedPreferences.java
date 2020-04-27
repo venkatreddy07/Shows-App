@@ -3,14 +3,15 @@ package com.task.moviesapp.repositrories;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.task.moviesapp.AppApplication;
-
 public class AppSharedPreferences {
 
     private static SharedPreferences preferences;
     private static AppSharedPreferences instance;
 
-    private AppSharedPreferences() {
+    private static Context context;
+
+    private AppSharedPreferences(Context context) {
+        AppSharedPreferences.context = context;
         createInstance();
     }
 
@@ -18,18 +19,18 @@ public class AppSharedPreferences {
         if (preferences == null) {
             synchronized (AppSharedPreferences.class) {
                 if (preferences == null) {
-                    preferences = AppApplication.getContext().getSharedPreferences(AppApplication.getContext()
+                    preferences = context.getSharedPreferences(context
                             .getPackageName(), Context.MODE_PRIVATE);
                 }
             }
         }
     }
 
-    public static AppSharedPreferences getInstance() {
+    public static AppSharedPreferences getInstance(Context context) {
         if (instance == null) {
             synchronized (AppSharedPreferences.class) {
                 if (instance == null) {
-                    instance = new AppSharedPreferences();
+                    instance = new AppSharedPreferences(context);
                 }
             }
         }
